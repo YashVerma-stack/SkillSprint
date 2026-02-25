@@ -31,9 +31,29 @@ export const courseApi = createApi({
         method: "POST",
         body: { courseTitle, category },    // Data sent in request body
       }),
-
       // After creating course → refetch creator courses automatically
       invalidatesTags: ['Refetch_Creator_Course']
+    }),
+    getSearchCourse: builder.query({
+      query: ({ searchQuery, categories, sortByPrice }) => {
+        // build query string
+        let queryString = `/search?query=${encodeURIComponent(searchQuery)}`;
+        // append category
+        if (categories && categories.length > 0) {
+          const categoriesString = categories.map(encodeURIComponent).join(",");
+          queryString += `&categories=${categoriesString}`
+        }
+
+        // Append sortByPrice if available
+        if(sortByPrice) {
+          queryString += `&sortByPrice=${ encodeURIComponent(sortByPrice)}`;
+        }
+
+        return {
+          url: queryString,
+          method:"GET",
+        }
+      }
     }),
 
     getPublishedCourse: builder.query({
@@ -127,4 +147,5 @@ export const {
   useRemoveLectureMutation,
   useGetLectureByIdQuery,
   usePublishCourseMutation,
+  useGetSearchCourseQuery,
 } = courseApi;
